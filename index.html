@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador Fútbol 7</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background: #444;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: #4caf50;
+      color: white;
+    }
+
+    .seccion {
+      display: none;
+    }
+
+    .seccion.active {
+      display: block;
+    }
+
+    button {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    input[type="text"], input[type="number"], input[type="file"], select {
+      padding: 8px;
+      width: 100%;
+      margin-top: 5px;
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 5px;
+    }
+
+    .light-mode body {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    .light-mode .tab {
+      background: #ddd;
+    }
+
+    .light-mode .tab.active {
+      background: #4caf50;
+      color: white;
+    }
+
+    .light-mode button {
+      background: #4caf50;
+      color: white;
+    }
+
+    .light-mode input[type="text"], .light-mode input[type="number"], .light-mode input[type="file"], .light-mode select {
+      background: #fff;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simulador de Fútbol 7</h1>
+  
+  <!-- Botón para cambiar entre modos claro y oscuro -->
+  <button onclick="toggleDarkMode()">🌙 / 🌞 Cambiar Modo</button>
+
+  <!-- Navegación tipo YouTube -->
+  <div class="tabs">
+    <div class="tab active" onclick="mostrarSeccion('ligas')">🏆 Ligas</div>
+    <div class="tab" onclick="mostrarSeccion('equipos')">🧢 Equipos</div>
+    <div class="tab" onclick="mostrarSeccion('jugadores')">🧍‍♂️ Jugadores</div>
+  </div>
+
+  <!-- Sección de Ligas -->
+  <section id="ligas" class="seccion active">
+    <h2>Ligas</h2>
+    <button onclick="mostrarFormularioLiga()">Agregar Liga</button>
+
+    <!-- Tabla de clasificación -->
+    <h3>Clasificación de Ligas</h3>
+    <table id="tabla-clasificacion" style="width:100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th>Puesto</th>
+          <th>Equipo</th>
+          <th>Victorias</th>
+          <th>Empates</th>
+          <th>Derrotas</th>
+          <th>Goles a Favor</th>
+          <th>Goles en Contra</th>
+          <th>Diferencia de Goles</th>
+        </tr>
+      </thead>
+      <tbody id="clasificacion-body">
+      </tbody>
+    </table>
+
+    <div id="formulario-liga" style="display:none;">
+      <input type="text" id="nombre-liga" placeholder="Nombre de la liga">
+      <button onclick="guardarLiga()">Guardar Liga</button>
+    </div>
+
+    <button onclick="simularJornada()">Simular Jornada Completa</button>
+  </section>
+
+  <!-- Sección de Equipos -->
+  <section id="equipos" class="seccion">
+    <h2>Equipos</h2>
+    <button onclick="mostrarFormularioEquipo()">Agregar Equipo</button>
+    <button onclick="volverALigas()">Volver a Ligas</button>
+    <div id="lista-equipos"></div>
+    <div id="formulario-equipo" style="display:none;">
+      <input type="text" id="nombre-equipo" placeholder="Nombre del equipo">
+      <input type="file" id="logo-equipo">
+      <button onclick="guardarEquipo()">Guardar Equipo</button>
+    </div>
+  </section>
+
+  <!-- Sección de Jugadores -->
+  <section id="jugadores" class="seccion">
+    <h2>Jugadores</h2>
+    <button onclick="mostrarFormularioJugador()">Agregar Jugador</button>
+    <button onclick="volverAEquipos()">Volver a Equipos</button>
+    <div id="lista-jugadores"></div>
+    <div id="formulario-jugador" style="display:none;">
+      <input type="text" id="nombre-jugador" placeholder="Nombre del jugador">
+      <select id="posicion-jugador">
+        <option>Portero</option>
+        <option>Defensa</option>
+        <option>Pivote</option>
+        <option>Delantero</option>
+      </select>
+      <input type="number" id="goles" placeholder="Goles">
+      <input type="number" id="asistencias" placeholder="Asistencias">
+      <button onclick="guardarJugador()">Guardar Jugador</button>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+  <script>
+    function toggleDarkMode() {
+      document.body.classList.toggle('light-mode');
+    }
+
+    function mostrarSeccion(id) {
+      document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      if (id === 'ligas') document.querySelector('.tab:nth-child(1)').classList.add('active');
+      else if (id === 'equipos') document.querySelector('.tab:nth-child(2)').classList.add('active');
+      else document.querySelector('.tab:nth-child(3)').classList.add('active');
+    }
+
+    function mostrarFormularioLiga() {
+      document.getElementById('formulario-liga').style.display = 'block';
+    }
+
+    function guardarLiga() {
+      const nombre = document.getElementById("nombre-liga").value.trim();
+      if (!nombre) return;
+      
+      let ligas = JSON.parse(localStorage.getItem("ligas")) || [];
+      ligas.push({
+        nombre,
+        partidos: [],
+        clasificacion: []
+      });
+      localStorage.setItem("ligas", JSON.stringify(ligas));
+      alert('Liga guardada correctamente!');
+    }
+
+    function simularJornada() {
+      let ligas = JSON.parse(localStorage.getItem("ligas")) || [];
+      let ligaActual = ligas[0];  // Puedes modificar para seleccionar una liga específica
+      ligaActual.partidos.forEach(partido => {
+        const goles1 = Math.floor(Math.random() * 5);
+        const goles2 = Math.floor(Math.random() * 5);
+        partido.resultado = `${goles1} - ${goles2}`;
+      });
+      localStorage.setItem("ligas", JSON.stringify(ligas));
+      alert('Jornada simulada!');
+    }
+
+    function volverALigas() {
+      mostrarSeccion("ligas");
+    }
+
+    function volverAEquipos() {
+      mostrarSeccion("equipos");
+    }
+  </script>
+</body>
+</html>
