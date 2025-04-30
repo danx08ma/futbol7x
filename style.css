@@ -1,27 +1,28 @@
-/* Modo oscuro */
+/* Estilos generales */
 body {
-  background-color: #121212;
-  color: #e0e0e0;
   font-family: Arial, sans-serif;
   margin: 0;
-  padding: 20px;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+.contenedor {
+  margin: 20px;
 }
 
 .tabs {
   display: flex;
-  gap: 10px;
+  justify-content: space-around;
   margin-bottom: 20px;
 }
 
 .tab {
-  padding: 10px 20px;
-  background: #444;
-  border-radius: 10px;
+  padding: 10px;
   cursor: pointer;
 }
 
 .tab.active {
-  background: #4caf50;
+  background-color: #3498db;
   color: white;
 }
 
@@ -34,67 +35,34 @@ body {
 }
 
 button {
-  background: #4caf50;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  cursor: pointer;
-  border-radius: 5px;
-  margin-top: 10px;
-}
-
-input[type="text"], input[type="number"], input[type="file"], select {
-  padding: 8px;
-  width: 100%;
-  margin-top: 5px;
-  background: #333;
-  color: #fff;
-  border: 1px solid #555;
-  border-radius: 5px;
-}
-
-/* Modo claro */
-.light-mode body {
-  background-color: #f5f5f5;
-  color: #333;
-}
-
-.light-mode .tab {
-  background: #ddd;
-}
-
-.light-mode .tab.active {
-  background: #4caf50;
-  color: white;
-}
-
-.light-mode button {
-  background: #4caf50;
-  color: white;
-}
-
-.light-mode input[type="text"], .light-mode input[type="number"], .light-mode input[type="file"], .light-mode select {
-  background: #fff;
-  color: #333;
-  border: 1px solid #ddd;
-}
-
-/* Estilo para las tablas de clasificación */
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  border: 1px solid #555;
   padding: 10px;
-  text-align: center;
+  margin: 10px 0;
+  cursor: pointer;
 }
 
-th {
+input[type="text"] {
+  padding: 10px;
+  margin: 5px 0;
+}
+
+input[type="text"]:focus {
+  border: 2px solid #3498db;
+}
+
+/* Estilos para el modo oscuro */
+body.light-mode {
   background-color: #333;
+  color: white;
 }
 
-.partido {
-  margin-bottom: 20px;
+body.light-mode .tabs {
+  background-color: #444;
+}
+
+body.light-mode .tab {
+  color: white;
+}
+
+body.light-mode .tab.active {
+  background-color: #1e90ff;
 }
