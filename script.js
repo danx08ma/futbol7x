@@ -155,3 +155,6 @@ function mostrarTabla() {
 }
 
 mostrarLigas();
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+}
