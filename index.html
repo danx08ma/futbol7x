@@ -5,6 +5,7 @@
   <title>Simulador Fútbol 7</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    /* Modo oscuro */
     body {
       background-color: #121212;
       color: #e0e0e0;
@@ -59,6 +60,7 @@
       border-radius: 5px;
     }
 
+    /* Modo claro */
     .light-mode body {
       background-color: #f5f5f5;
       color: #333;
@@ -83,12 +85,31 @@
       color: #333;
       border: 1px solid #ddd;
     }
+
+    /* Estilo para las tablas de clasificación */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #555;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #333;
+    }
+
+    .partido {
+      margin-bottom: 20px;
+    }
+
   </style>
 </head>
 <body>
   <h1>Simulador de Fútbol 7</h1>
-  
-  <!-- Botón para cambiar entre modos claro y oscuro -->
   <button onclick="toggleDarkMode()">🌙 / 🌞 Cambiar Modo</button>
 
   <!-- Navegación tipo YouTube -->
@@ -102,10 +123,10 @@
   <section id="ligas" class="seccion active">
     <h2>Ligas</h2>
     <button onclick="mostrarFormularioLiga()">Agregar Liga</button>
-
+    
     <!-- Tabla de clasificación -->
-    <h3>Clasificación de Ligas</h3>
-    <table id="tabla-clasificacion" style="width:100%; border-collapse: collapse;">
+    <h3>Clasificación de Equipos</h3>
+    <table id="tabla-clasificacion">
       <thead>
         <tr>
           <th>Puesto</th>
@@ -119,6 +140,7 @@
         </tr>
       </thead>
       <tbody id="clasificacion-body">
+        <!-- Aquí se llenarán los datos dinámicamente -->
       </tbody>
     </table>
 
@@ -126,8 +148,6 @@
       <input type="text" id="nombre-liga" placeholder="Nombre de la liga">
       <button onclick="guardarLiga()">Guardar Liga</button>
     </div>
-
-    <button onclick="simularJornada()">Simular Jornada Completa</button>
   </section>
 
   <!-- Sección de Equipos -->
@@ -161,14 +181,22 @@
       <input type="number" id="asistencias" placeholder="Asistencias">
       <button onclick="guardarJugador()">Guardar Jugador</button>
     </div>
+    <div id="opciones-transferencia">
+      <button onclick="transferirJugador()">Transferir Jugador</button>
+    </div>
   </section>
 
   <script src="script.js"></script>
   <script>
+    let ligas = JSON.parse(localStorage.getItem('ligas')) || [];
+
+    // Función para cambiar entre modo oscuro y claro
     function toggleDarkMode() {
-      document.body.classList.toggle('light-mode');
+      const body = document.body;
+      body.classList.toggle('light-mode');
     }
 
+    // Función para cambiar de secciones
     function mostrarSeccion(id) {
       document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
       document.getElementById(id).classList.add('active');
@@ -179,6 +207,7 @@
       else document.querySelector('.tab:nth-child(3)').classList.add('active');
     }
 
+    // Funciones para manejar Ligas
     function mostrarFormularioLiga() {
       document.getElementById('formulario-liga').style.display = 'block';
     }
@@ -186,36 +215,109 @@
     function guardarLiga() {
       const nombre = document.getElementById("nombre-liga").value.trim();
       if (!nombre) return;
-      
-      let ligas = JSON.parse(localStorage.getItem("ligas")) || [];
+
       ligas.push({
         nombre,
+        equipos: [],
         partidos: [],
-        clasificacion: []
+        tablaClasificacion: [],
       });
+
       localStorage.setItem("ligas", JSON.stringify(ligas));
-      alert('Liga guardada correctamente!');
+      renderizarLigas();
+      document.getElementById("formulario-liga").style.display = "none";
     }
 
-    function simularJornada() {
-      let ligas = JSON.parse(localStorage.getItem("ligas")) || [];
-      let ligaActual = ligas[0];  // Puedes modificar para seleccionar una liga específica
-      ligaActual.partidos.forEach(partido => {
-        const goles1 = Math.floor(Math.random() * 5);
-        const goles2 = Math.floor(Math.random() * 5);
-        partido.resultado = `${goles1} - ${goles2}`;
+    // Renderizar Ligas
+    function renderizarLigas() {
+      let html = "<h3>Lista de Ligas</h3><ul>";
+      ligas.forEach((liga, i) => {
+        html += `
+          <li>
+            ${liga.nombre}
+            <button onclick="mostrarPartidos(${i})">Partidos</button>
+            <button onclick="mostrarClasificacion(${i})">Clasificación</button>
+          </li>
+        `;
       });
-      localStorage.setItem("ligas", JSON.stringify(ligas));
-      alert('Jornada simulada!');
+      html += "</ul>";
+      document.getElementById("lista-ligas").innerHTML = html;
     }
 
+    // Funciones para manejar Equipos y Jugadores
+    function mostrarFormularioEquipo() {
+      document.getElementById('formulario-equipo').style.display = 'block';
+    }
+
+    function guardarEquipo() {
+      const nombre = document.getElementById("nombre-equipo").value.trim();
+      if (!nombre) return;
+
+      const equipo = {
+        nombre,
+        jugadores: [],
+      };
+
+      // Asignar equipo a la liga
+      const liga = ligas[ligas.length - 1];
+      liga.equipos.push(equipo);
+      localStorage.setItem("ligas", JSON.stringify(ligas));
+      renderizarEquipos();
+      document.getElementById("formulario-equipo").style.display = "none";
+    }
+
+    function renderizarEquipos() {
+      let html = "<h3>Lista de Equipos</h3><ul>";
+      ligas.forEach(liga => {
+        liga.equipos.forEach(equipo => {
+          html += `<li>${equipo.nombre}</li>`;
+        });
+      });
+      html += "</ul>";
+      document.getElementById("lista-equipos").innerHTML = html;
+    }
+
+    function mostrarFormularioJugador() {
+      document.getElementById('formulario-jugador').style.display = 'block';
+    }
+
+    function guardarJugador() {
+      const nombre = document.getElementById("nombre-jugador").value.trim();
+      const posicion = document.getElementById("posicion-jugador").value;
+      const goles = document.getElementById("goles").value;
+      const asistencias = document.getElementById("asistencias").value;
+
+      if (!nombre) return;
+
+      const jugador = { nombre, posicion, goles, asistencias };
+
+      // Asignar jugador a su equipo
+      const equipo = ligas[ligas.length - 1].equipos[0];
+      equipo.jugadores.push(jugador);
+      localStorage.setItem("ligas", JSON.stringify(ligas));
+      renderizarJugadores();
+      document.getElementById("formulario-jugador").style.display = "none";
+    }
+
+    function renderizarJugadores() {
+      let html = "<h3>Lista de Jugadores</h3><ul>";
+      ligas.forEach(liga => {
+        liga.equipos.forEach(equipo => {
+          equipo.jugadores.forEach(jugador => {
+            html += `<li>${jugador.nombre} - ${jugador.posicion} (${jugador.goles} goles, ${jugador.asistencias} asistencias)</li>`;
+          });
+        });
+      });
+      html += "</ul>";
+      document.getElementById("lista-jugadores").innerHTML = html;
+    }
+
+    // Función de retroceso
     function volverALigas() {
       mostrarSeccion("ligas");
     }
 
-    function volverAEquipos() {
-      mostrarSeccion("equipos");
-    }
+    renderizarLigas();
   </script>
 </body>
 </html>
